@@ -106,9 +106,18 @@ module BestInPlace
         object.send(opts[:display_as]).to_s
 
       elsif opts[:display_with].try(:is_a?, Proc)
-        BestInPlace::DisplayMethods.add_helper_proc(klass, field, opts[:display_with])
-        opts[:display_with].call(object.send(field))
+        if opts[:collection]
+          type = opts[:as] || :input
+          field = field.to_s
+          collection = best_in_place_default_collection if collection.blank?
+          collection = best_in_place_collection_builder(type, collection)
+          display_with = lambda { |v| opts[:display_with].call(collection.flat_map{|a| a[0].to_s == v ? a[1] : nil }.compact[0]) }
+          BestInPlace::DisplayMethods.add_helper_proc(klass, field, display_with)
+        else
+          BestInPlace::DisplayMethods.add_helper_proc(klass, field, opts[:display_with])
+        end
 
+        opts[:display_with].call(object.send(field))
       elsif opts[:display_with]
         BestInPlace::DisplayMethods.add_helper_method(klass, field, opts[:display_with], opts[:helper_options])
         if opts[:helper_options]
