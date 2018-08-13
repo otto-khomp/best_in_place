@@ -24,7 +24,7 @@ module BestInPlace
         collection = best_in_place_collection_builder(type, collection)
 
         if opts[:display_with].try(:is_a?, Proc)
-          display_value = opts[:display_with].call(collection.flat_map{|a| a[0].to_s == value ? a[1] : nil }.compact[0])
+          # best_in_place_build_value_for takes care of it.
         else
           display_value = collection.flat_map{|a| a[0].to_s == value ? a[1] : nil }.compact[0]
         end
@@ -117,11 +117,11 @@ module BestInPlace
             opts[:display_with].call(collection.flat_map{|a| a[0].to_s == value ? a[1] : nil }.compact[0])
           end
           BestInPlace::DisplayMethods.add_helper_proc(klass, field, display_with)
+          display_with.call(object.send(field))
         else
           BestInPlace::DisplayMethods.add_helper_proc(klass, field, opts[:display_with])
+          opts[:display_with].call(object.send(field))
         end
-
-        opts[:display_with].call(object.send(field))
       elsif opts[:display_with]
         BestInPlace::DisplayMethods.add_helper_method(klass, field, opts[:display_with], opts[:helper_options])
         if opts[:helper_options]
