@@ -109,9 +109,13 @@ module BestInPlace
         if opts[:collection]
           type = opts[:as] || :input
           field = field.to_s
+          collection = opts[:collection]
           collection = best_in_place_default_collection if collection.blank?
           collection = best_in_place_collection_builder(type, collection)
-          display_with = lambda { |v| opts[:display_with].call(collection.flat_map{|a| a[0].to_s == v ? a[1] : nil }.compact[0]) }
+
+          display_with = Proc.new do |value|
+            opts[:display_with].call(collection.flat_map{|a| a[0].to_s == value ? a[1] : nil }.compact[0])
+          end
           BestInPlace::DisplayMethods.add_helper_proc(klass, field, display_with)
         else
           BestInPlace::DisplayMethods.add_helper_proc(klass, field, opts[:display_with])
