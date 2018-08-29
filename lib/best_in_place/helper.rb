@@ -43,7 +43,7 @@ module BestInPlace
       options[:data]['bip-html-attrs'] = opts[:html_attrs].to_json unless opts[:html_attrs].blank?
       options[:data]['bip-inner-class'] = opts[:inner_class].presence
 
-      options[:data]['bip-placeholder'] = html_escape(opts[:place_holder]).presence
+      options[:data]['bip-placeholder'] = html_escape(opts[:place_holder]) unless opts[:place_holder].nil?
 
       options[:data]['bip-object'] = opts[:param] || BestInPlace::Utils.object_to_key(real_object)
       options[:data]['bip-ok-button'] = opts[:ok_button].presence
